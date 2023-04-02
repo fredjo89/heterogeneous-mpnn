@@ -192,12 +192,12 @@ class Hmct3Layer(torch.nn.Module):
         self.node_type = node_type 
         self.node_types = data.node_types # All node types in the graph
 
-        self.dim_message_layer_1 = 2 # Choice from thesis: 2
-        self.dim_message_layer_2 = 2 # Choice from thesis: 2
-        self.dim_message_layer_3 = 10 # Choice from thesis (final layer): 10
+        self.dim_message_layer_1 = 5 # Choice from thesis: 2
+        self.dim_message_layer_2 = 5 # Choice from thesis: 2
+        self.dim_message_layer_3 = 15 # Choice from thesis (final layer): 10
 
-        self.dim_out_layer_1 = 5 # Choice from thesis: 5
-        self.dim_out_layer_2 = 5 # Choice from thesis: 5
+        self.dim_out_layer_1 = 10 # Choice from thesis: 5
+        self.dim_out_layer_2 = 10 # Choice from thesis: 5
         self.dim_out_layer_3 = 1 # Specifies the final dimension of the representation vector for node_type (the final output of the class)
 
         # dim_in_2 is used as input when creating the second layer "hmct message passing operator". 
