@@ -1,4 +1,5 @@
 import math, random, torch, matplotlib.pyplot as plt, pandas as pd, logging
+from sklearn.metrics import auc, roc_curve, roc_auc_score, precision_recall_curve
 
 def get_num_params_of_model(model):
     """
@@ -14,7 +15,8 @@ def get_num_params_of_model(model):
         total_dim += dim
     return total_dim
 
-def plot_training_hist(train_hist): 
+
+def plot_training_hist(train_hist):
     """
     DocString...
     """
@@ -26,6 +28,7 @@ def plot_training_hist(train_hist):
     ax.set_ylabel("Loss")
     plt.legend()
     plt.show()
+
 
 def _draw(bool_array, draw_frac):
     """
@@ -99,14 +102,12 @@ def train_val_test_split(val_frac, test_frac, y):
     return train_mask, val_mask, test_mask
 
 
-
-
 def _early_stopping(train_hist):
     """
     DocString...
     """
     epoch = train_hist.shape[0] - 1
-    if train_hist.loc[epoch , "loss_val"] > train_hist.loc[epoch - 1, "loss_val"]:
+    if train_hist.loc[epoch, "loss_val"] > train_hist.loc[epoch - 1, "loss_val"]:
         return True
 
     return False
@@ -156,7 +157,7 @@ def train_model(
 
         if train_hist.loc[epoch, "loss_val"] == train_hist["loss_val"].min():
             best_model = model
-        
+
         if epoch >= min_epochs and _early_stopping(train_hist):
             logging.info(
                 f"Early stopping at epoch #{epoch} (validation loss is decreasing)."
@@ -170,8 +171,6 @@ def train_model(
         optimizer.step()
 
     return best_model, train_hist
-
-from sklearn.metrics import auc, roc_curve, roc_auc_score, precision_recall_curve
 
 
 def _plot_roc_curve(pred, y, mask, ax, split):
