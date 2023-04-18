@@ -1,12 +1,15 @@
 """
-This file contains the classes that defines the MPNN-models with various number of layers. 
-These models are not intended to be used as final models, but are used to benchmark the HMCT-models. 
+This file contains the classes that defines the HMPNN models with sum as aggregation and with various number of layers. 
+These models are not intended to be used as final models, but are used to benchmark the HMPNN_ct-models. 
+
+
+
 
 Main functions: 
-    NNConv1Layer()
-    NNConv2Layer()
-    NNConv3Layer()
-    NNConv4Layer()
+    HMPNN_sum_1Layer()
+    HMPNN_sum_2Layer()
+    HMPNN_sum_3Layer()
+    HMPNN_sum_4Layer()
 
 """
 
@@ -85,7 +88,7 @@ class InnerLayer(torch.nn.Module):
 
 
 # One Layer NNConv
-class NNConv1Layer(torch.nn.Module):
+class HMPNN_sum_1Layer(torch.nn.Module):
     def __init__(self, data, node_type="indivi"):
         super().__init__()
         self.node_type = node_type
@@ -97,7 +100,7 @@ class NNConv1Layer(torch.nn.Module):
         return torch.sigmoid(x_dict[self.node_type])
 
 
-class NNConv2Layer(torch.nn.Module):
+class HMPNN_sum_2Layer(torch.nn.Module):
     def __init__(self, data, node_type="indivi"):
         super().__init__()
         self.node_type = node_type
@@ -113,7 +116,7 @@ class NNConv2Layer(torch.nn.Module):
         return torch.sigmoid(x_dict[self.node_type])
 
 
-class NNConv3Layer(torch.nn.Module):
+class HMPNN_sum_3Layer(torch.nn.Module):
     def __init__(self, data, node_type="indivi"):
         super().__init__()
         self.node_type = node_type
@@ -133,7 +136,7 @@ class NNConv3Layer(torch.nn.Module):
         return torch.sigmoid(x_dict[self.node_type])
 
 
-class NNConv4Layer(torch.nn.Module):
+class HMPNN_sum_4Layer(torch.nn.Module):
     def __init__(self, data, node_type="indivi"):
         super().__init__()
         self.node_type = node_type

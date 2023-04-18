@@ -1,11 +1,11 @@
 """
-This file contains the classes that defines the HMCT-models with various number of layers. 
+This file contains the classes that defines the HMPNN_ct-models with various number of layers. 
 
 Main functions: 
-    Hmct1Layer()
-    Hmct2Layer()
-    Hmct3Layer()
-    Hmct4Layer()
+    HMPNN_ct_1Layer()
+    HMPNN_ct_2Layer()
+    HMPNN_ct_3Layer()
+    HMPNN_ct_4Layer()
 """
 
 import torch, torch_geometric
@@ -14,7 +14,7 @@ from torch_geometric.nn import HeteroConv, NNConv
 ################################################################################################
 def create_dim_in(data, dim):
     """
-    Helper function that creates the "dim_in" dictionary used as input to HmctLayer(). 
+    Helper function that creates the "dim_in" dictionary used as input to HMPNN_ct_Layer(). 
     The keys of the dict are each node type in the graph, and the value is the number "dim" (same for all keys)
     Input:
         data: The graph object
@@ -28,13 +28,13 @@ def create_dim_in(data, dim):
 ################################################################################################
 
 ################################################################################################
-class HmctLayer(torch.nn.Module):
+class HMPNN_ct_Layer(torch.nn.Module):
     """
-    This class creates the HMCT-model for a single node type in a single layer. Assembling multiple objects of this class (that depends on the number of layers in the model and nodes in the graph) will produce a full HMCT-model. 
+    This class creates the HMPNN_ct-model for a single node type in a single layer. Assembling multiple objects of this class (that depends on the number of layers in the model and nodes in the graph) will produce a full HMPNN_ct-model. 
     In the case of a single-layer model that makes prediction of a single node-type, this will consist only of a single object of this class. 
 
     An object of this class takes as input the graph and the node-representation vectors of all nodes of all node-types, and output the new node node-representations for one specific node-type (specified by the input-paramter node_type). 
-    The new node-representation is a result of having applied the operation we call "MPNN with HMCT aggregation".
+    The new node-representation is a result of having applied the operation we call "HMPNN with HMCT aggregation".
     This means to perform two main operators: 
         1. For each meta_step ending with node_type, apply the MPNN operator. This will produce one vector for each meta-step, each of which can be seen as an incoming message to nodes of type node_type. 
         2. Concatenate the message-vectors into one vector, and apply a linear transformation to the result. The output is the new representation of the nodes of type node_type
@@ -107,9 +107,9 @@ class HmctLayer(torch.nn.Module):
 
 
 ################################################################################################
-class Hmct1Layer(torch.nn.Module):
+class HMPNN_ct_1Layer(torch.nn.Module):
     """
-    The class that defines the 1-layer HMCT-model used for binary node-classification on nodes of type node_type 
+    The class that defines the 1-layer HMPNN_ct-model used for binary node-classification on nodes of type node_type 
     Input: 
         data: The graph object
         node_type: The node_type to classify (predict which binary class each node of type node_type belongs to)
@@ -124,8 +124,8 @@ class Hmct1Layer(torch.nn.Module):
         self.dim_message_layer_1 = 10 # Determines the dimension of the vectors that is the output accross each meta-step (i.e. for each MPNN-operator). This dimension is the same for all meta-steps. 
         self.dim_out = 1 # Specifies the final dimension of the representation vector for node_type (the final output of the class). Since this is used for binary classification, it is set to 1. 
 
-        # Creating the HMCT-operator for the node-type node_type for the single-layer model. 
-        self.layer = HmctLayer(data, node_type = self.node_type, dim_message=self.dim_message_layer_1, dim_out = self.dim_out)
+        # Creating the HMPNN_ct-operator for the node-type node_type for the single-layer model. 
+        self.layer = HMPNN_ct_Layer(data, node_type = self.node_type, dim_message=self.dim_message_layer_1, dim_out = self.dim_out)
 
     def forward(self, x_dict, edge_index_dict, edge_attr_dict):
         # Applying the model
@@ -133,9 +133,9 @@ class Hmct1Layer(torch.nn.Module):
 ################################################################################################
 
 ################################################################################################
-class Hmct2Layer(torch.nn.Module):
+class HMPNN_ct_2Layer(torch.nn.Module):
     """
-    The class that defines the 2-layer HMCT-model used for binary node-classification on nodes of type node_type 
+    The class that defines the 2-layer HMPNN_ct-model used for binary node-classification on nodes of type node_type 
     Input: 
         data: The graph object
         node_type: The node_type to classify (predict which binary class each node of type node_type belongs to)
@@ -158,13 +158,13 @@ class Hmct2Layer(torch.nn.Module):
         #   The variable is used to specify the representation/feature dimension of each node type in the graph after having been transformed by the first layer. This is required because we allow the representation dimension for a node type change from the dimension of its original feature vector after a message passing layer is applied. 
         self.dim_in_2 = create_dim_in(data, self.dim_out_layer_1) 
 
-        # Creating the HMCT-operators for the first layer: one operator for each node_type in the graph. 
+        # Creating the HMPNN_ct-operators for the first layer: one operator for each node_type in the graph. 
         self.layer_1 = torch.nn.ModuleList()
         for nt in data.node_types:
-            self.layer_1.append(HmctLayer(data, node_type = nt, dim_message=self.dim_message_layer_1, dim_out = self.dim_out_layer_1))
+            self.layer_1.append(HMPNN_ct_Layer(data, node_type = nt, dim_message=self.dim_message_layer_1, dim_out = self.dim_out_layer_1))
 
-        # Creating the HMCT-operators for the output-layer: Only created for node_type (the node to make predictions on)
-        self.layer_2 = HmctLayer(data, node_type = node_type, dim_in = self.dim_in_2, dim_message=self.dim_message_layer_2, dim_out = self.dim_out)
+        # Creating the HMPNN_ct-operators for the output-layer: Only created for node_type (the node to make predictions on)
+        self.layer_2 = HMPNN_ct_Layer(data, node_type = node_type, dim_in = self.dim_in_2, dim_message=self.dim_message_layer_2, dim_out = self.dim_out)
 
     def forward(self, x_dict, edge_index_dict, edge_attr_dict):
         x_dict_updates = {}
@@ -176,9 +176,9 @@ class Hmct2Layer(torch.nn.Module):
 ################################################################################################
 
 ################################################################################################
-class Hmct3Layer(torch.nn.Module):
+class HMPNN_ct_3Layer(torch.nn.Module):
     """
-    The class that defines the 3-layer HMCT-model used for binary node-classification on nodes of type node_type 
+    The class that defines the 3-layer HMPNN_ct-model used for binary node-classification on nodes of type node_type 
     Input: 
         data: The graph object
         node_type: The node_type to classify (predict which binary class each node of type node_type belongs to)
@@ -205,15 +205,15 @@ class Hmct3Layer(torch.nn.Module):
         self.dim_in_2 = create_dim_in(data, self.dim_out_layer_1) 
         self.dim_in_3 = create_dim_in(data, self.dim_out_layer_2) 
 
-      # Creating the HMCT-operators for the first and second layer: one operator for each node_type in the graph, for each layer. 
+      # Creating the HMPNN_ct-operators for the first and second layer: one operator for each node_type in the graph, for each layer. 
         self.layer_1 = torch.nn.ModuleList()
         self.layer_2 = torch.nn.ModuleList()
         for nt in data.node_types:
-            self.layer_1.append(HmctLayer(data, node_type = nt, dim_message=self.dim_message_layer_1, dim_out = self.dim_out_layer_1))
-            self.layer_2.append(HmctLayer(data, node_type = nt, dim_in = self.dim_in_2, dim_message=self.dim_message_layer_2, dim_out = self.dim_out_layer_2))
+            self.layer_1.append(HMPNN_ct_Layer(data, node_type = nt, dim_message=self.dim_message_layer_1, dim_out = self.dim_out_layer_1))
+            self.layer_2.append(HMPNN_ct_Layer(data, node_type = nt, dim_in = self.dim_in_2, dim_message=self.dim_message_layer_2, dim_out = self.dim_out_layer_2))
 
-      # Creating the HMCT-operators for the output-layer: Only created for node_type (the node to make predictions on)
-        self.layer_3 = HmctLayer(data, node_type = node_type, dim_in = self.dim_in_3, dim_message=self.dim_message_layer_3, dim_out = self.dim_out_layer_3)
+      # Creating the HMPNN_ct-operators for the output-layer: Only created for node_type (the node to make predictions on)
+        self.layer_3 = HMPNN_ct_Layer(data, node_type = node_type, dim_in = self.dim_in_3, dim_message=self.dim_message_layer_3, dim_out = self.dim_out_layer_3)
 
     def forward(self, x_dict, edge_index_dict, edge_attr_dict):        
         x_dict_updates = {}
@@ -228,9 +228,9 @@ class Hmct3Layer(torch.nn.Module):
 ################################################################################################
 
 ################################################################################################
-class Hmct4Layer(torch.nn.Module):
+class HMPNN_ct_4Layer(torch.nn.Module):
     """
-    The class that defines the 4-layer HMCT-model used for binary node-classification on nodes of type node_type 
+    The class that defines the 4-layer HMPNN_ct-model used for binary node-classification on nodes of type node_type 
     Input: 
         data: The graph object
         node_type: The node_type to classify (predict which binary class each node of type node_type belongs to)
@@ -260,17 +260,17 @@ class Hmct4Layer(torch.nn.Module):
         self.dim_in_3 = create_dim_in(data, self.dim_out_layer_2) 
         self.dim_in_4 = create_dim_in(data, self.dim_out_layer_3) 
 
-      # Creating the HMCT-operators for the first, second and third layer: one operator for each node_type in the graph, for each layer. 
+      # Creating the HMPNN_ct-operators for the first, second and third layer: one operator for each node_type in the graph, for each layer. 
         self.layer_1 = torch.nn.ModuleList()
         self.layer_2 = torch.nn.ModuleList()
         self.layer_3 = torch.nn.ModuleList()
         for nt in data.node_types:
-            self.layer_1.append(HmctLayer(data, node_type = nt, dim_message=self.dim_message_layer_1, dim_out = self.dim_out_layer_1))
-            self.layer_2.append(HmctLayer(data, node_type = nt, dim_in = self.dim_in_2, dim_message=self.dim_message_layer_2, dim_out = self.dim_out_layer_2))
-            self.layer_3.append(HmctLayer(data, node_type = nt, dim_in = self.dim_in_3, dim_message=self.dim_message_layer_3, dim_out = self.dim_out_layer_3))
+            self.layer_1.append(HMPNN_ct_Layer(data, node_type = nt, dim_message=self.dim_message_layer_1, dim_out = self.dim_out_layer_1))
+            self.layer_2.append(HMPNN_ct_Layer(data, node_type = nt, dim_in = self.dim_in_2, dim_message=self.dim_message_layer_2, dim_out = self.dim_out_layer_2))
+            self.layer_3.append(HMPNN_ct_Layer(data, node_type = nt, dim_in = self.dim_in_3, dim_message=self.dim_message_layer_3, dim_out = self.dim_out_layer_3))
 
-      # Creating the HMCT-operators for the output-layer: Only created for node_type (the node to make predictions on)
-        self.layer_4 = HmctLayer(data, node_type = node_type, dim_in = self.dim_in_4, dim_message=self.dim_message_layer_4, dim_out = self.dim_out_layer_4)
+      # Creating the HMPNN_ct-operators for the output-layer: Only created for node_type (the node to make predictions on)
+        self.layer_4 = HMPNN_ct_Layer(data, node_type = node_type, dim_in = self.dim_in_4, dim_message=self.dim_message_layer_4, dim_out = self.dim_out_layer_4)
 
     def forward(self, x_dict, edge_index_dict, edge_attr_dict):        
         x_dict_updates = {}
