@@ -2,9 +2,6 @@
 This file contains the classes that defines the HMPNN models with sum as aggregation and with various number of layers. 
 These models are not intended to be used as final models, but are used to benchmark the HMPNN_ct-models. 
 
-
-
-
 Main functions: 
     HMPNN_sum_1Layer()
     HMPNN_sum_2Layer()
