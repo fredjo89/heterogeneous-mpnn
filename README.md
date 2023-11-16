@@ -1,6 +1,6 @@
 # Heterogeneous MPNN
 This repository contains implementation of a heterogeneous version of the GNN method MPNN (H-MPNN) from the [“Neural Message Passing for Quantum Chemistry”](https://arxiv.org/abs/1704.01212) paper. 
-The implementation is used in the ["Finding Money Launderers Using Heterogeneous Graph"](placeholder) paper.
+The implementation is used in the ["Finding Money Launderers Using Heterogeneous Graph"](https://arxiv.org/pdf/2307.13499.pdf) paper.
 It is implemented using the ["PyTorch Geometric"](https://pytorch-geometric.readthedocs.io/en/latest/index.html) library. 
 The repository provides a running code example on a small publically available dataset to illustrate its use. <br>
 
