@@ -10,8 +10,7 @@ Main functions:
 
 """
 
-
-import torch, torch_geometric
+import torch
 from torch_geometric.nn import HeteroConv, NNConv
 
 

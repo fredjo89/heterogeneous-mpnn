@@ -1,5 +1,6 @@
 import math, random, torch, matplotlib.pyplot as plt, pandas as pd, logging
-from sklearn.metrics import auc, roc_curve, roc_auc_score, precision_recall_curve
+from sklearn.metrics import roc_curve, roc_auc_score
+
 
 def get_num_params_of_model(model):
     """
@@ -64,8 +65,9 @@ def _draw(bool_array, draw_frac):
 def train_val_test_split(val_frac, test_frac, y):
     """
     Creates train/validation/test masks.
-    Stratified random sampling is employed to create train/validation/test masks with an allocation that is proportionate to the original class balance,
-    thereby ensuring that the class balance is maintained across all three sets.
+    Stratified random sampling is employed to create train/validation/test masks with
+    an allocation that is proportionate to the original class balance, thereby ensuring
+    that the class balance is maintained across all three sets.
 
     Parameters
     ----------
@@ -83,8 +85,6 @@ def train_val_test_split(val_frac, test_frac, y):
     pos_mask = y == 1
     neg_mask = y == 0
 
-    val_frac = val_frac
-    test_frac = test_frac
     ## Creating test-mask ##
     pos_test = _draw(pos_mask, test_frac)  # Drawing observations for y == 1
     neg_test = _draw(neg_mask, test_frac)  # Drawing observations for y == 0
@@ -126,16 +126,19 @@ def train_model(
     """
     DocString...
     """
+
     # Initialize the loss-function and optimizer
     loss_fun = torch.nn.BCELoss()
     # optimizer = torch.optim.SGD(model.parameters(), lr=0.001, weight_decay=1e-7)
     optimizer = torch.optim.Adam(
-        model.parameters(), lr=learning_rate, weight_decay=weight_decay
+        model.parameters(),
+        lr=learning_rate,
+        weight_decay=weight_decay,
     )
 
     y = data[node_type_to_classify].y
-    # Training model with early stopping
 
+    # Training model with early stopping
     train_hist = pd.DataFrame(columns=["loss_train", "loss_val"])
     model.train()
     for epoch in range(max_epochs):
